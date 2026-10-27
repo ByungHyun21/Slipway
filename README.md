@@ -104,12 +104,39 @@ Deterministic checks; failures bounce back into the generation loop:
 
 ## Status
 
-**Design stage.** Only this README exists; implementation has not started.
+**Core loop implemented (M0).** Registry, state machine, deterministic gates,
+approval-gated export, and the download catalog are working. Generator adapters
+(submitting *into* ComfyUI/CosyVoice) and engine mappings remain to be built.
 
-- [ ] Registry schema + CLI
-- [ ] ComfyUI / CosyVoice adapters
-- [ ] Gates (shape × 3)
-- [ ] `slip export godot`
+```
+[x] Registry schema + CLI (`slip`)
+[x] Lifecycle: brief → generated → gated → approved → exported, gate-fail bounce
+[x] Gates: shape (PNG/JPEG/GIF/WebP dims, format, sprite alpha),
+    audio (WAV duration/loudness/clipping), checksum integrity, provenance
+[x] `slip serve` launch gallery: media-preview grid (pixel art, prose excerpts,
+    video, SVG waveforms), lightbox dossiers, lifecycle funnel + search,
+    approved-only (sealed plates otherwise), Range/inline streaming, JSON + ZIP
+[x] `slip export --to` — copy approved revisions out of the forge
+[ ] ComfyUI / CosyVoice submit adapters
+[ ] Canon-embedding gate, godot/unreal export mappings
+```
+
+## Usage
+
+```sh
+slip init my-game                    # create a forge (canon/ assets/ staging/ gates/ approved/ exports/)
+cd my-game
+slip brief hero_idle --type sprite --scene canon/story/ch03.md#L12
+slip add hero_idle out.png --backend comfyui --param seed=812   # stage + auto-gate
+slip approve hero_idle               # human pick → approved/
+slip serve                           # http://127.0.0.1:8321 — download approved artifacts
+slip export hero_idle --to ../MyGame/assets/generated           # launch
+
+slip list / slip show <id> / slip gate <id> --rev 2
+```
+
+Gate policy lives in `gates/config.yaml` (formats, dimension bounds, audio
+loudness/clipping limits); everything is plain YAML + files, tracked in git.
 
 ## The name
 
